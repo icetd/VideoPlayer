@@ -23,4 +23,4 @@ cd build
 input your url for rtsp rtmp or filePath
 ```
 
-![image](https://github.com/icetd/VideoPlayer/png/test.png)
+![image](https://github.com/icetd/VideoPlayer/tree/master/png/test.png)
