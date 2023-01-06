@@ -1,0 +1,6 @@
+[submodule "thirdlib/UNIX/glfw"]
+	path = thirdlib/UNIX/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "thirdlib/UNIX/glew"]
+	path = thirdlib/UNIX/glew
+	url = https://github.com/edoren/glew.git
