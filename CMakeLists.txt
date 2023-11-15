@@ -82,7 +82,7 @@ endif ()
 
 if (WIN32)
 	list(APPEND EXTRA_LIBS
-		opengl32 glfw User32 Gdi32 Shell32 -subsystem,windows
+		opengl32 glfw User32 Gdi32 Shell32
  	)
 elseif (UNIX)
 	list (APPEND EXTRA_LIBS
