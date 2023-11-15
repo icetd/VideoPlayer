@@ -1,11 +1,17 @@
-#include "VideoView.h"
+﻿#include "VideoView.h"
 #include "imgui.h"
+
+#define IMGUI_DEMO_MARKER(section)  \
+    do { if (GImGuiDemoMarkerCallback != NULL) \
+            GImGuiDemoMarkerCallback(__FILE__, __LINE__, section, GImGuiDemoMarkerCallbackUserData); \
+    } while (0)
 
 VideoView::VideoView() : 
     isStartCapture(false),
     isStart(false),
     m_VideoCapture(nullptr),
-    m_TexTure(nullptr)
+    m_TexTure(nullptr),
+    m_url("rtsp://192.168.2.128:8554/unicast")
 {
     m_TexTure = std::make_unique<Texture>();
     m_VideoCapture = std::make_unique<VideoCapture>();
@@ -19,29 +25,47 @@ VideoView::~VideoView()
 
 void VideoView::OnUpdate()
 {
+
     {
         ImGui::Begin("Control");
-        ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.1f, 0.1f, 0.1f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
-        if (ImGui::Button("start", ImVec2(80, 40))) {
+        ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.2f);
+        ImGui::AlignTextToFramePadding();
+
+        static char str1[128] = "";
+        ImGui::InputTextWithHint("input url", "set rtsp url here", m_url, IM_ARRAYSIZE(m_url));
+        
+        ImGui::NewLine();
+        ImVec2 sz = ImVec2(-FLT_MIN, 0.0f);
+        if (ImGui::Button(u8"开始", sz)) {
             isStart = true;
         }
-        ImGui::SameLine();
-        if (ImGui::Button("stop", ImVec2(80, 40))) {
+        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
+            ImGui::SetTooltip("Start play rtps video.");
+
+        if (ImGui::Button(u8"停止", sz)) {
             isStart = false;
         }
-        ImGui::PopStyleColor(3);
+        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
+            ImGui::SetTooltip("Stop play rtps video.");
 
         ImGui::NewLine();
         ImGui::Text("Player Status:");
         ImGui::SameLine();
         ImGui::TextColored(ImVec4(255, 0, 0, 255), "%s", (isStart ? "Start" : "Stop"));
+
+        ImGui::Separator();
+        ImGui::ShowStyleSelector("Theme");
         ImGui::NewLine();
-	ImGui::TextColored(ImVec4(255, 0, 0, 255),"Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        
+        ImGui::Separator();
+        ImGui::NewLine();
+        ImGui::NewLine();
+	    ImGui::TextColored(ImVec4(0, 255, 0, 255),"Application average %.3f ms/frame (%.1f FPS)", 
+                                1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::PopItemWidth();
         ImGui::End();
     }
-
+    
     {
         ImGui::Begin("View");
         OnImGuiRender();
@@ -55,7 +79,7 @@ void VideoView::run()
     while(!this->isStoped()) {
 
         if(isStart == true && isStartCapture == false ) {
-            startPlay("rtsp://192.168.2.128:8554/unicast");
+            startPlay();
         } else if (isStart == false && isStartCapture == true) {
             stopPlay();
         }
@@ -95,11 +119,11 @@ void VideoView::OnImGuiRender()
         ImGui::Image((ImTextureID)(intptr_t)0, ImVec2(viewportSize.x, viewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
 }
 
-void VideoView::startPlay(const char *url)
+void VideoView::startPlay()
 {
     bool re = false;
     m_VideoCapture->init();
-    re = m_VideoCapture->open(url);
+    re = m_VideoCapture->open(m_url);
     if (!re) {
         isStart = false;
         return; 

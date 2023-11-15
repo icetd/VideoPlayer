@@ -9,7 +9,7 @@
 class Application 
 {
 public:
-    Application(const char *appName);
+    Application(const char *appName, int w, int h);
     ~Application();
 
     void run();
@@ -26,6 +26,8 @@ private:
     double m_fps;
 
     std::unique_ptr<VideoView> m_VideoView;
+    int m_width;
+    int m_height;
 };
 
 

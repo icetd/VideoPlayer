@@ -7,7 +7,7 @@
 int main(int argc, char **argv)
 {
     initLogger(INFO);
-    Application app("VideoPlayer");
+    Application app("VideoPlayer", 1160, 720);
     app.run();
     app.wait();
     return 0;

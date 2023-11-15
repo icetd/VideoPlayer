@@ -22,9 +22,11 @@ void Application::keyCallback(GLFWwindow* window, int key, int scancode, int act
 	}
 }
 
-Application::Application(const char* appName) :
+Application::Application(const char* appName, int w, int h) :
 	m_window(nullptr),
-	m_appName(appName)
+	m_appName(appName),
+	m_width(w),
+	m_height(h)
 {
 
 }
@@ -46,7 +48,7 @@ void Application::run()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-	m_window = glfwCreateWindow(1280, 720, m_appName.c_str(), NULL, NULL);
+	m_window = glfwCreateWindow(m_width, m_height, m_appName.c_str(), NULL, NULL);
 	if (!m_window) {
 		glfwTerminate();
 		exit(EXIT_FAILURE);
@@ -74,7 +76,7 @@ void Application::run()
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
 	io.ConfigFlags != ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
 
-	ImGui::StyleColorsClassic();
+	ImGui::StyleColorsDark();
 
 	ImGuiStyle& style = ImGui::GetStyle();
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)

@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+#include <string>
 #include "Texuture.h"
 #include "VideoCapture.h"
 #include "Mthread.h"
@@ -20,7 +21,7 @@ private:
   
     void OnRender();
     void OnImGuiRender();
-    void startPlay(const char *url);
+    void startPlay();
     
     std::unique_ptr <Texture> m_TexTure;
     std::unique_ptr <VideoCapture> m_VideoCapture;
@@ -34,6 +35,7 @@ private:
     bool isStartCapture;
     bool isStart;
     bool isDcodeSucceed;
+    char m_url[128] = "";
 };
 
 #endif
