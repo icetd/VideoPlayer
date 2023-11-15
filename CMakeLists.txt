@@ -13,7 +13,7 @@ elseif (UNIX)
 endif()
 
 set (CMKAE_CXX_STANDARD 14)
-set (CMAKE_BUILD_TYPE Debug)
+set (CMAKE_BUILD_TYPE Relesae)
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 

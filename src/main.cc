@@ -1,4 +1,6 @@
-﻿#include <iostream>
+﻿#pragma comment( linker, "/subsystem:windows /entry:mainCRTStartup")
+
+#include <iostream>
 #include "log.h"
 #include "application.h"
 
