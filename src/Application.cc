@@ -1,13 +1,13 @@
 #include <stdlib.h>
-
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_internal.h>
 #include <tinyfiledialogs.h>
-
 #include "Application.h"
 #include "log.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 void Application::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
@@ -49,6 +49,15 @@ void Application::run()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	m_window = glfwCreateWindow(m_width, m_height, m_appName.c_str(), NULL, NULL);
+	GLFWimage icon;
+    icon.width = 32;
+    icon.height = 32;
+    int channels = 3;
+    icon.pixels = stbi_load("res/textures/tiandeng.png", &icon.width, &icon.height, &channels, 4);
+    glfwSetWindowIcon(m_window, 1, &icon);
+	stbi_image_free(icon.pixels);
+
+	glfwGetWindowAttrib(m_window, GLFW_TRANSPARENT_FRAMEBUFFER);
 	if (!m_window) {
 		glfwTerminate();
 		exit(EXIT_FAILURE);
@@ -74,7 +83,7 @@ void Application::run()
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
-	io.ConfigFlags != ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
 
 	ImGui::StyleColorsDark();
 

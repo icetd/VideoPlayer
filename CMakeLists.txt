@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+﻿cmake_minimum_required(VERSION 3.10)
 project(VideoPlayer)
 
 add_subdirectory(thirdparty/glfw)
@@ -68,6 +68,7 @@ file (GLOB_RECURSE INC_FILES
 
 file (GLOB_RECURSE RES_FILES
     "${CMAKE_SOURCE_DIR}/res/shaders/*.shader"
+    "${CMAKE_SOURCE_DIR}/res/*.rc"
 )
 
 
@@ -103,7 +104,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${SOURCE_DIR})
 
 #===================== LINKING LIBRARIES =======================#
 if (WIN32)
-	target_link_libraries(${PROJECT_NAME} ${EXTRA_LIBS} swscale swresample avformat avdevice avformat avcodec avutil )
+	target_link_libraries(${PROJECT_NAME} ${EXTRA_LIBS} swscale avformat avdevice  avcodec avutil )
 else (UNIX)
 	target_link_libraries(${PROJECT_NAME} ${EXTRA_LIBS})
 endif()
