@@ -1,4 +1,4 @@
-#include "MThread.h"
+﻿#include "MThread.h"
 #include "log.h"
 
 
