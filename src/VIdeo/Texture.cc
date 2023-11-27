@@ -5,7 +5,6 @@ Texture::Texture()
 {
 	glActiveTexture(GL_TEXTURE0);
 	glGenTextures(1, &m_ID);
-	glBindTexture(GL_TEXTURE_2D, m_ID);
 }
 
 Texture::~Texture()
