@@ -117,9 +117,9 @@ void VideoView::OnImGuiRender()
 {
     ImVec2 viewportSize = ImGui::GetContentRegionAvail();
     if (isStartCapture)
-        ImGui::Image((ImTextureID)(intptr_t)m_TexTure->getId(), ImVec2(viewportSize.x, viewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
+        ImGui::Image((ImTextureID)(intptr_t)m_TexTure->getId(), ImVec2(viewportSize.x, viewportSize.y), ImVec2(0, 0), ImVec2(1, 1));
     else 
-        ImGui::Image((ImTextureID)(intptr_t)0, ImVec2(viewportSize.x, viewportSize.y), ImVec2(0, 1), ImVec2(1, 0));
+        ImGui::Image((ImTextureID)(intptr_t)0, ImVec2(viewportSize.x, viewportSize.y), ImVec2(1, 1), ImVec2(1, 1));
 }
 
 void VideoView::startPlay()
