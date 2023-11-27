@@ -91,11 +91,13 @@ void VideoView::run()
             m_pts = 1;
             isDcodeSucceed = m_VideoCapture->decode(m_data, &m_pts);
             if (isDcodeSucceed) {
+                dataMutex.lock();
                 std::vector<uint8_t> rgbData(m_data, m_data + length);
                 m_FrameBufferList.push_back(std::move(rgbData));
                 if (m_FrameBufferList.size() > 10) {    // set max buffer size
                     m_FrameBufferList.pop_back();
                 }
+                dataMutex.unlock();
             }
         }
     }
@@ -107,9 +109,11 @@ void VideoView::run()
 void VideoView::OnRender()
 {
     if (!m_FrameBufferList.empty()) {
+        dataMutex.lock();
         m_FrameBuffer = m_FrameBufferList.back();
         m_TexTure->bind(m_width, m_height, m_FrameBuffer.data());
         m_FrameBufferList.pop_back();
+        dataMutex.unlock();
     }
 }
 

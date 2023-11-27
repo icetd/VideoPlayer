@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <mutex>
 #include "Texuture.h"
 #include "VideoCapture.h"
 #include "Mthread.h"
@@ -29,6 +30,8 @@ private:
     int64_t m_pts;
     std::vector<uint8_t> m_FrameBuffer;
     std::vector<std::vector<uint8_t>> m_FrameBufferList;
+
+    std::mutex dataMutex;
 
     int m_width;
     int m_height;
