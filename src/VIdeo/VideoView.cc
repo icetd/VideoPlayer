@@ -94,7 +94,7 @@ void VideoView::run()
                 dataMutex.lock();
                 std::vector<uint8_t> rgbData(m_data, m_data + length);
                 m_FrameBufferList.push_back(std::move(rgbData));
-                if (m_FrameBufferList.size() > 10) {    // set max buffer size
+                if (m_FrameBufferList.size() > 2) {    // set max buffer size
                     m_FrameBufferList.pop_back();
                 }
                 dataMutex.unlock();
