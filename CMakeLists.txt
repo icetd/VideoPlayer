@@ -29,9 +29,12 @@ set (IMGUI_SRC			"${CMAKE_CURRENT_LIST_DIR}/thirdparty/imgui")
 set (FILEDIALOGS_SRC	"${CMAKE_CURRENT_LIST_DIR}/thirdparty/tinyfiledialogs")
 set (FFMPEG_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/thirdparty/FFmpeg/include")
 set (FFMPEG_LIB_DIR     "${CMAKE_SOURCE_DIR}/thirdparty/FFmpeg/lib")
+set (VLD_INCLUDE_DIR    "${CMAKE_SOURCE_DIR}/thirdparty/VLD/include")
+set (VLD_LIB_DIR        "${CMAKE_SOURCE_DIR}/thirdparty/VLD/lib")
 
 link_directories(
 		${FFMPEG_LIB_DIR}
+		${VLD_LIB_DIR}
 )
 
 include_directories(
@@ -46,6 +49,7 @@ include_directories(
 	${FILEDIALOGS_SRC}
 	${FILEDIALOGS_SRC}/backends
 	${FFMPEG_INCLUDE_DIR}
+	${VLD_INCLUDE_DIR}
 ) 
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)

@@ -4,6 +4,13 @@
 #include "log.h"
 #include "application.h"
 
+#define VLD 0
+
+#if VLD
+#include <vld.h>
+#endif
+
+
 int main(int argc, char **argv)
 {
     initLogger(INFO);

@@ -142,6 +142,12 @@ void Application::run()
 		m_fps = ImGui::GetIO().Framerate;
 		glfwSwapBuffers(m_window);
 	}
+	ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
+    glfwDestroyWindow(m_window);
+    glfwTerminate();
 }
 
 

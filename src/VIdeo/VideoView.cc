@@ -145,6 +145,8 @@ void VideoView::stopPlay()
 {
     isStartCapture = false;
     m_VideoCapture->close();
+    if (m_data)
+        free(m_data);
     m_data = nullptr;
 }
 
