@@ -20,6 +20,7 @@ void VideoCapture::init()
 	sws_scaler_ctx = nullptr;
 	avdevice_register_all();
 	avformat_network_init();
+	av_log_set_level(AV_LOG_FATAL);
     LOG(INFO, "libCapture init success.");
 }
 
