@@ -208,7 +208,7 @@ void Application::mainUI()
 
 	if (ImGui::BeginMenuBar())
 	{
-		if (ImGui::BeginMenu(u8"settings"))
+		if (ImGui::BeginMenu(u8"设置"))
 		{
 			// Disabling fullscreen would allow the window to be moved to the front of other windows,
 			// which we can't undo at the moment without finer window depth/z control.
