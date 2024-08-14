@@ -27,7 +27,7 @@ Application::Application(const char* appName, int w, int h) :
 	m_width(w),
 	m_height(h)
 {
-
+	m_isDisplay = true;
 }
 
 Application::~Application()
