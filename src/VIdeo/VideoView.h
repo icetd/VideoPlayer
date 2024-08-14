@@ -7,7 +7,7 @@
 #include <mutex>
 #include "Texuture.h"
 #include "VideoCapture.h"
-#include "Mthread.h"
+#include "MThread.h"
 
 class VideoView : public MThread
 {
