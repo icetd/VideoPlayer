@@ -11,7 +11,7 @@ MSBuild.exe VideoPlayer.sln -t:Rebuild -p:Configuration=Release
 mkdir build
 cmake ..
 make -j8
-`
+```
 
 App Demo base on imgui.
 
