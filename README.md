@@ -1,7 +1,7 @@
 ## build for win
 
 ```
-mkdir build && cd build
+mkdir build
 cmake ..
 MSBuild.exe VideoPlayer.sln -t:Rebuild -p:Configuration=Release
 ```
