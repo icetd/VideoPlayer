@@ -1,7 +1,7 @@
 ## build for win
 
 ```
-mkdir build
+mkdir build && cd build
 cmake ..
 MSBuild.exe VideoPlayer.sln -t:Rebuild -p:Configuration=Release
 ```
@@ -9,7 +9,7 @@ MSBuild.exe VideoPlayer.sln -t:Rebuild -p:Configuration=Release
 ## build for Linux
 ```
 sudo apt install ffmpeg -y
-mkdir build
+mkdir build && cd build
 cmake ..
 make -j8
 ```
