@@ -15,4 +15,4 @@ make -j8
 
 App Demo base on imgui.
 
-![](pic/view.png)
+![](pic/demo.png)
