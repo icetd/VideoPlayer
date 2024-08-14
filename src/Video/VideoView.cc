@@ -36,13 +36,13 @@ void VideoView::OnUpdate()
         
         ImGui::NewLine();
         ImVec2 sz = ImVec2(-FLT_MIN, 0.0f);
-        if (ImGui::Button(u8"开始", sz)) {
+        if (ImGui::Button(u8"start", sz)) {
             isStart = true;
         }
         if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
             ImGui::SetTooltip("Start play rtps video.");
 
-        if (ImGui::Button(u8"停止", sz)) {
+        if (ImGui::Button(u8"stop", sz)) {
             isStart = false;
         }
         if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))

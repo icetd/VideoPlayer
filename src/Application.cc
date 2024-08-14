@@ -3,7 +3,6 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_internal.h>
-#include <tinyfiledialogs.h>
 #include "Application.h"
 #include "log.h"
 #define STB_IMAGE_IMPLEMENTATION
@@ -209,7 +208,7 @@ void Application::mainUI()
 
 	if (ImGui::BeginMenuBar())
 	{
-		if (ImGui::BeginMenu(u8"设置"))
+		if (ImGui::BeginMenu(u8"Settings"))
 		{
 			// Disabling fullscreen would allow the window to be moved to the front of other windows,
 			// which we can't undo at the moment without finer window depth/z control.

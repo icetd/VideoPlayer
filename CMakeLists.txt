@@ -4,14 +4,6 @@ project(VideoPlayer)
 add_subdirectory(thirdparty/glfw)
 add_subdirectory(thirdparty/glm)
 
-if (WIN32)
-	add_definitions()
-
-elseif (UNIX)
-
-	add_definitions()
-endif()
-
 set (CMKAE_CXX_STANDARD 14)
 set (CMAKE_BUILD_TYPE Release)
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -27,8 +19,14 @@ set (STB_IMAGE_INC		"${CMAKE_CURRENT_LIST_DIR}/thirdparty/stb_image")
 set (GLM_INC			"${CMAKE_CURRENT_LIST_DIR}/thirdparty/glm")
 set (IMGUI_SRC			"${CMAKE_CURRENT_LIST_DIR}/thirdparty/imgui")
 set (FILEDIALOGS_SRC	"${CMAKE_CURRENT_LIST_DIR}/thirdparty/tinyfiledialogs")
-set (FFMPEG_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/thirdparty/FFmpeg/include")
-set (FFMPEG_LIB_DIR     "${CMAKE_SOURCE_DIR}/thirdparty/FFmpeg/lib")
+
+if (WIN32)
+	set (FFMPEG_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/thirdparty/FFmpeg/include")
+	set (FFMPEG_LIB_DIR     "${CMAKE_SOURCE_DIR}/thirdparty/FFmpeg/lib")
+elseif (UNIX)
+	add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/FFmpeg/unix)
+endif()
+
 set (VLD_INCLUDE_DIR    "${CMAKE_SOURCE_DIR}/thirdparty/VLD/include")
 set (VLD_LIB_DIR        "${CMAKE_SOURCE_DIR}/thirdparty/VLD/lib")
 
@@ -46,8 +44,6 @@ include_directories(
 	${STB_IMAGE_INC}
 	${GLM_INC}
 	${IMGUI_SRC}
-	${FILEDIALOGS_SRC}
-	${FILEDIALOGS_SRC}/backends
 	${FFMPEG_INCLUDE_DIR}
 	${VLD_INCLUDE_DIR}
 ) 
@@ -58,16 +54,12 @@ file(GLOB_RECURSE SRC_FILES
     "${SOURCE_DIR}/*.c*"
 	"${GLAD_SRC}/*c*"
 	"${IMGUI_SRC}/*.c*"
-	"${FILEDIALOGS_SRC}/*c*"
-	"${FILEDIALOGS_SRC}/backends/*c*"
 )
 
 file (GLOB_RECURSE INC_FILES
     "${INCLUDE_DIR}/*.h"
 	"${IMGUI_SRC}/*.h"
 	"${GLAD_INC}/*h"
-	"${FILEDIALOGS_SRC}/*h"
-	"${FILEDIALOGS_SRC}/backends/*h"
 )
 
 file (GLOB_RECURSE RES_FILES
@@ -95,11 +87,7 @@ elseif (UNIX)
 	)
 endif ()
 
-if (WIN32)
-	add_executable(${PROJECT_NAME} ${SRC_FILES} ${INC_FILES} ${RES_FILES})
-elseif (UNIX)
-	add_executable(${PROJECT_NAME} ${SRC_FILES} )
-endif ()
+add_executable(${PROJECT_NAME} ${SRC_FILES} ${INC_FILES} ${RES_FILES})
 
 # Add the target includes for MY_PROJECT 
 target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIR})
@@ -107,14 +95,15 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${SOURCE_DIR})
 
 
 #===================== LINKING LIBRARIES =======================#
-if (WIN32)
-	target_link_libraries(${PROJECT_NAME} ${EXTRA_LIBS} swscale avformat avdevice  avcodec avutil )
-else (UNIX)
-	target_link_libraries(${PROJECT_NAME} ${EXTRA_LIBS})
-endif()
+target_link_libraries(${PROJECT_NAME} ${EXTRA_LIBS} swscale avformat avdevice  avcodec avutil )
 
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+if (WIN32)
 file (GLOB FFMPEG_COPY_DLL "${CMAKE_SOURCE_DIR}/thirdparty/FFmpeg/dll/*")
 file(COPY ${FFMPEG_COPY_DLL} DESTINATION ${EXECUTABLE_OUTPUT_PATH}/${CMAKE_BUILD_TYPE})
 file(COPY ${CMAKE_SOURCE_DIR}/config/imgui.ini DESTINATION ${EXECUTABLE_OUTPUT_PATH}/${CMAKE_BUILD_TYPE})
 file(COPY ${CMAKE_SOURCE_DIR}/res DESTINATION ${EXECUTABLE_OUTPUT_PATH}/${CMAKE_BUILD_TYPE})
+elseif (UNIX)
+file(COPY ${CMAKE_SOURCE_DIR}/config/imgui.ini DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+file(COPY ${CMAKE_SOURCE_DIR}/res DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+endif()
