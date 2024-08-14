@@ -97,7 +97,7 @@ void Application::run()
 	ImGui_ImplOpenGL3_Init(glsl_version);
 
 	// fonts set
-	io.Fonts->AddFontFromFileTTF("res/fonts/YaHei.ttf", 16.0f, nullptr, io.Fonts->GetGlyphRangesChineseFull());
+	io.Fonts->AddFontFromFileTTF("res/fonts/Yahei.ttf", 16.0f, nullptr, io.Fonts->GetGlyphRangesChineseFull());
 	ImVec4 clear_color = ImVec4(0.33f, 0.33f, 0.33f, 1.00f);
 
 	m_VideoView = std::make_unique<VideoView>();
@@ -208,7 +208,7 @@ void Application::mainUI()
 
 	if (ImGui::BeginMenuBar())
 	{
-		if (ImGui::BeginMenu(u8"Settings"))
+		if (ImGui::BeginMenu(u8"settings"))
 		{
 			// Disabling fullscreen would allow the window to be moved to the front of other windows,
 			// which we can't undo at the moment without finer window depth/z control.
