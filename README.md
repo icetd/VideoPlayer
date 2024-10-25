@@ -1,5 +1,7 @@
 ## build for win
 
+Visual Studio 2022 or 2019
+
 ```
 mkdir build && cd build
 cmake ..
