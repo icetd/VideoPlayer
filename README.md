@@ -1,6 +1,6 @@
 ## build for win
 
-Visual Studio 2022 or 2019
+Visual Studio 2022
 
 ```
 mkdir build && cd build
