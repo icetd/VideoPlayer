@@ -1,6 +1,6 @@
 ## build for win
 
-Visual Studio 2022
+ENV: Visual Studio 2022
 
 ```
 mkdir build && cd build
