@@ -10,7 +10,15 @@ MSBuild.exe VideoPlayer.sln -t:Rebuild -p:Configuration=Release
 
 ## build for Linux
 ```
-sudo apt install ffmpeg -y
+sudo apt install -y \
+libavcodec-dev \
+libavformat-dev \
+libavfilter-dev \
+libavdevice-dev \
+libavutil-dev \
+libswresample-dev \
+libswscale-dev
+
 mkdir build && cd build
 cmake ..
 make -j8
