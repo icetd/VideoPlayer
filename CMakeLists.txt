@@ -22,8 +22,11 @@ set (FILEDIALOGS_SRC	"${CMAKE_CURRENT_LIST_DIR}/thirdparty/tinyfiledialogs")
 
 if (WIN32)
 	set (FFMPEG_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/thirdparty/FFmpeg/win/include")
-	set (FFMPEG_LIB_DIR     "${CMAKE_SOURCE_DIR}/thirdparty/FFmpeg/win/lib")
+	set (FFMPEG_LIB_DIR "${CMAKE_SOURCE_DIR}/thirdparty/FFmpeg/win/lib")
+    set (JPEGTURBO_INCCLUDE_DIR "${CMAKE_SOURCE_DIR}/thirdparty/libjpeg-turbo/win/include")
+    set (JPEGTURBO_LIB_DIR "${CMAKE_SOURCE_DIR}/thirdparty/libjpeg-turbo/win/lib")
 elseif (UNIX)
+    add_subdirectory(thirdparty/libjpeg-turbo/unix/libjpeg-turbo)
 	add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/FFmpeg/unix)
 endif()
 
@@ -33,6 +36,7 @@ set (VLD_LIB_DIR        "${CMAKE_SOURCE_DIR}/thirdparty/VLD/lib")
 link_directories(
 		${FFMPEG_LIB_DIR}
 		${VLD_LIB_DIR}
+        ${JPEGTURBO_LIB_DIR}
 )
 
 include_directories(
@@ -45,6 +49,7 @@ include_directories(
 	${GLM_INC}
 	${IMGUI_SRC}
 	${FFMPEG_INCLUDE_DIR}
+    ${JPEGTURBO_INC}
 	${VLD_INCLUDE_DIR}
 ) 
 
@@ -95,7 +100,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${SOURCE_DIR})
 
 
 #===================== LINKING LIBRARIES =======================#
-target_link_libraries(${PROJECT_NAME} ${EXTRA_LIBS} swscale avformat avdevice  avcodec avutil )
+target_link_libraries(${PROJECT_NAME} ${EXTRA_LIBS} swscale avformat avdevice  avcodec avutil turbojpeg)
 
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 if (WIN32)

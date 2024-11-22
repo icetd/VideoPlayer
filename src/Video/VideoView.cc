@@ -92,11 +92,10 @@ void VideoView::run()
             isDcodeSucceed = m_VideoCapture->decode(m_data, &m_pts);
             if (isDcodeSucceed) {
                 dataMutex.lock();
-                std::vector<uint8_t> rgbData(m_data, m_data + length);
-                m_FrameBufferList.push_back(std::move(rgbData));
                 if (m_FrameBufferList.size() > 2) {    // set max buffer size
-                    m_FrameBufferList.pop_back();
+                    m_FrameBufferList.erase(m_FrameBufferList.begin());
                 }
+                m_FrameBufferList.emplace_back(m_data, m_data + length);
                 dataMutex.unlock();
             }
         }
@@ -150,3 +149,7 @@ void VideoView::stopPlay()
     m_data = nullptr;
 }
 
+void VideoView::saveAsImage()
+{
+
+}

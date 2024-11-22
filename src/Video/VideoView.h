@@ -17,12 +17,14 @@ public:
     void OnUpdate();
     void run() override;
     void stopPlay();
+    void saveAsImage();
 
 private:
   
     void OnRender();
     void OnImGuiRender();
     void startPlay();
+
     
     std::unique_ptr <Texture> m_TexTure;
     std::unique_ptr <VideoCapture> m_VideoCapture;
