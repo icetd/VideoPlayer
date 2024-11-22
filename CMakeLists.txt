@@ -23,7 +23,7 @@ set (FILEDIALOGS_SRC	"${CMAKE_CURRENT_LIST_DIR}/thirdparty/tinyfiledialogs")
 if (WIN32)
 	set (FFMPEG_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/thirdparty/FFmpeg/win/include")
 	set (FFMPEG_LIB_DIR "${CMAKE_SOURCE_DIR}/thirdparty/FFmpeg/win/lib")
-    set (JPEGTURBO_INCCLUDE_DIR "${CMAKE_SOURCE_DIR}/thirdparty/libjpeg-turbo/win/include")
+    set (JPEGTURBO_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/thirdparty/libjpeg-turbo/win/include")
     set (JPEGTURBO_LIB_DIR "${CMAKE_SOURCE_DIR}/thirdparty/libjpeg-turbo/win/lib")
 elseif (UNIX)
     add_subdirectory(thirdparty/libjpeg-turbo/unix/libjpeg-turbo)
@@ -49,7 +49,7 @@ include_directories(
 	${GLM_INC}
 	${IMGUI_SRC}
 	${FFMPEG_INCLUDE_DIR}
-    ${JPEGTURBO_INC}
+    ${JPEGTURBO_INCLUDE_DIR}
 	${VLD_INCLUDE_DIR}
 ) 
 

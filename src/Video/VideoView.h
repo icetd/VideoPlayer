@@ -8,6 +8,7 @@
 #include "Texuture.h"
 #include "VideoCapture.h"
 #include "MThread.h"
+#include "turbojpeg.h"
 
 class VideoView : public MThread
 {
