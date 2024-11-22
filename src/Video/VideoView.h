@@ -9,6 +9,7 @@
 #include "VideoCapture.h"
 #include "MThread.h"
 #include "TimeStamp.h"
+#include "Utils.h"
 
 class VideoView : public MThread
 {
@@ -44,6 +45,8 @@ private:
     bool isShowPicture;
     std::string cur_picture_path;
     char m_url[128] = "";
+
+    AppLog m_log;
 };
 
 #endif

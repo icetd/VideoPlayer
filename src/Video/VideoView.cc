@@ -4,6 +4,7 @@
 #include "ImGuiFileDialog.h"
 #include "jpeglib.h"
 #include "Texuture.h"
+#include "Utils.h"
 
 #ifdef WIN32
 #include <Windows.h>
@@ -107,6 +108,12 @@ void VideoView::OnUpdate()
         ImGui::Begin("View");
         OnImGuiRender();
         OnRender();
+        ImGui::End();
+    }
+
+    {
+        ImGui::Begin(u8"日志");
+        m_log.Draw(u8"日志");
         ImGui::End();
     }
 }
@@ -261,7 +268,7 @@ void VideoView::saveFrameAsJPEG(const std::vector<uint8_t>& frameData, int width
     fclose(outfile);
     jpeg_destroy_compress(&cinfo);
 
-    printf("Saved frame as JPEG: %s\n", filename.c_str());
+    m_log.AddLog(u8"Saved frame as JPEG: %s\n", filename.c_str());
 }
 
 void VideoView::ShowImagePopup(const char* popup_title, const std::string &path, bool* is_open)
