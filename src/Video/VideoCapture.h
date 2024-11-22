@@ -38,6 +38,9 @@ private:
 	AVFrame *av_frame;
 	AVPacket *av_packet;
 	SwsContext *sws_scaler_ctx;
+    int sws_width = 0;         
+    int sws_height = 0;        
+    AVPixelFormat sws_pix_fmt; 
 };
 
 #endif

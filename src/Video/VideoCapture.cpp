@@ -105,50 +105,61 @@ bool VideoCapture::open(const char *url)
 	return true;
 }
 
-bool VideoCapture::decode(uint8_t *frame, int64_t *pts)
-{
+bool VideoCapture::decode(uint8_t *frame, int64_t *pts) {
     int response;
-    char errStr[256] = { 0 };
-    while(av_read_frame(av_format_ctx, av_packet) >= 0) {
+    char errStr[256] = {0};
+
+    while (av_read_frame(av_format_ctx, av_packet) >= 0) {
         if (av_packet->stream_index != video_stream_index) {
             av_packet_unref(av_packet);
             continue;
         }
+
         response = avcodec_send_packet(av_codec_ctx, av_packet);
+        av_packet_unref(av_packet);
         if (response < 0) {
             av_strerror(response, errStr, sizeof(errStr));
-            LOG(ERROR, "Failed to decode packet: %s\n", errStr);
+            LOG(ERROR, "Failed to send packet: %s\n", errStr);
             return false;
-        } 
+        }
+
         response = avcodec_receive_frame(av_codec_ctx, av_frame);
         if (response == AVERROR(EAGAIN) || response == AVERROR_EOF) {
-            av_packet_unref(av_packet);
             continue;
         } else if (response < 0) {
             av_strerror(response, errStr, sizeof(errStr));
-            LOG(ERROR, "Failed to decode packet: %s\n", errStr);
+            LOG(ERROR, "Failed to receive frame: %s\n", errStr);
             return false;
         }
-        av_packet_unref(av_packet);
-        break;
+
+        *pts = av_frame->pts;
+
+        // 初始化 SWS 上下文（仅当分辨率或像素格式变化时）
+        if (!sws_scaler_ctx || av_frame->width != sws_width || av_frame->height != sws_height || av_codec_ctx->pix_fmt != sws_pix_fmt) {
+            if (sws_scaler_ctx) 
+                sws_freeContext(sws_scaler_ctx);
+
+            sws_scaler_ctx = sws_getContext(av_frame->width, av_frame->height, av_codec_ctx->pix_fmt,
+                                            av_frame->width, av_frame->height, AV_PIX_FMT_RGBA,
+                                            SWS_BILINEAR, NULL, NULL, NULL);
+            if (!sws_scaler_ctx) {
+                LOG(ERROR, "Couldn't initialize SWS context\n");
+                return false;
+            }
+
+            sws_width = av_frame->width;
+            sws_height = av_frame->height;
+            sws_pix_fmt = av_codec_ctx->pix_fmt;
+        }
+
+        uint8_t *dest[4] = {frame, NULL, NULL, NULL};
+        int dest_linesize[4] = {av_frame->width * 4, 0, 0, 0};
+
+        sws_scale(sws_scaler_ctx, av_frame->data, av_frame->linesize, 0, av_frame->height, dest, dest_linesize);
+        return true;
     }
 
-    *pts = av_frame->pts;
-
-    sws_scaler_ctx = sws_getContext(av_frame->width, av_frame->height, av_codec_ctx->pix_fmt,
-                                                av_frame->width, av_frame->height, AV_PIX_FMT_RGBA,
-                                                SWS_BILINEAR, NULL, NULL, NULL);
-    if (!sws_scaler_ctx) {
-        LOG(ERROR,"Coudldn't initialize sw scaler\n");
-        return false;
-    }
-
-    uint8_t* dest[4] = {frame, NULL, NULL, NULL};
-    int dest_linesize[4] = {av_frame->width * 4, 0, 0, 0 };
-	sws_scale(sws_scaler_ctx, av_frame->data, av_frame->linesize, 0, av_frame->height, dest, dest_linesize);
-    sws_freeContext(sws_scaler_ctx);
-
-	return true;
+    return false;
 }
 
 bool VideoCapture::close()
