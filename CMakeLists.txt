@@ -42,7 +42,7 @@ link_directories(
 include_directories(
 	${INCLUDE_DIR}
 	${INCLUDE_DIR}/Video
-	${INCLUDE_DIR}/Graphics
+	${INCLUDE_DIR}/Utils
 	${GLFW_INC}
 	${GLAD_INC}
 	${STB_IMAGE_INC}
@@ -57,6 +57,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 file(GLOB_RECURSE SRC_FILES
     "${SOURCE_DIR}/*.c*"
+    "${SOURCE_DIR}/Video/*.c*"
+    "${SOURCE_DIR}/Utils/*.c*"
 	"${GLAD_SRC}/*c*"
 	"${IMGUI_SRC}/*.c*"
 )
@@ -100,11 +102,11 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${SOURCE_DIR})
 
 
 #===================== LINKING LIBRARIES =======================#
-target_link_libraries(${PROJECT_NAME} ${EXTRA_LIBS} swscale avformat avdevice  avcodec avutil turbojpeg)
+target_link_libraries(${PROJECT_NAME} ${EXTRA_LIBS} swscale avformat avdevice  avcodec avutil jpeg)
 
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 if (WIN32)
-file (GLOB FFMPEG_COPY_DLL "${CMAKE_SOURCE_DIR}/thirdparty/FFmpeg/win/dll/*")
+file (GLOB FFMPEG_COPY_DLL "${CMAKE_SOURCE_DIR}/thirdparty/FFmpeg/win/dll/*" "${CMAKE_SOURCE_DIR}/thirdparty/libjpeg-turbo/win/dll/*")
 file(COPY ${FFMPEG_COPY_DLL} DESTINATION ${EXECUTABLE_OUTPUT_PATH}/${CMAKE_BUILD_TYPE})
 file(COPY ${CMAKE_SOURCE_DIR}/config/imgui.ini DESTINATION ${EXECUTABLE_OUTPUT_PATH}/${CMAKE_BUILD_TYPE})
 file(COPY ${CMAKE_SOURCE_DIR}/res DESTINATION ${EXECUTABLE_OUTPUT_PATH}/${CMAKE_BUILD_TYPE})

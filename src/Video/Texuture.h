@@ -3,19 +3,25 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <string>
 
 class Texture
 {
 public:
 	Texture();
+    Texture(const std::string filepathname, std::string texType, bool isPgm);
 	~Texture();
 
     void bind(int width, int height, uint8_t *rgbData);
     void unbind() const;
-    inline int getId() const { return m_ID; }
+    inline int getId() const { return m_TextureID; }
 
 private:
-	unsigned int m_ID;
+    GLuint m_TextureID;
+    std::string m_type;
+    bool m_isPgm;
+    std::string m_filepathName;
+
 };
 
 #endif

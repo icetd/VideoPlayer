@@ -8,7 +8,7 @@
 #include "Texuture.h"
 #include "VideoCapture.h"
 #include "MThread.h"
-#include "turbojpeg.h"
+#include "TimeStamp.h"
 
 class VideoView : public MThread
 {
@@ -18,14 +18,14 @@ public:
     void OnUpdate();
     void run() override;
     void stopPlay();
-    void saveAsImage();
 
 private:
   
     void OnRender();
     void OnImGuiRender();
     void startPlay();
-
+    void saveFrameAsJPEG(const std::vector<uint8_t>& frameData, int width, int height, const std::string& filename);
+    void ShowImagePopup(const char* popup_title, const std::string &path, bool* is_open);
     
     std::unique_ptr <Texture> m_TexTure;
     std::unique_ptr <VideoCapture> m_VideoCapture;
@@ -41,6 +41,8 @@ private:
     bool isStartCapture;
     bool isStart;
     bool isDcodeSucceed;
+    bool isShowPicture;
+    std::string cur_picture_path;
     char m_url[128] = "";
 };
 
