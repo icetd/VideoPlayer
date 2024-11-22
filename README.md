@@ -17,7 +17,8 @@ libavfilter-dev \
 libavdevice-dev \
 libavutil-dev \
 libswresample-dev \
-libswscale-dev
+libswscale-dev \
+libjpeg-dev
 
 mkdir build && cd build
 cmake ..
