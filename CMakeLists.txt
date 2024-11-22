@@ -26,7 +26,6 @@ if (WIN32)
     set (JPEGTURBO_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/thirdparty/libjpeg-turbo/win/include")
     set (JPEGTURBO_LIB_DIR "${CMAKE_SOURCE_DIR}/thirdparty/libjpeg-turbo/win/lib")
 elseif (UNIX)
-    add_subdirectory(thirdparty/libjpeg-turbo/unix/libjpeg-turbo)
 	add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/FFmpeg/unix)
 endif()
 
