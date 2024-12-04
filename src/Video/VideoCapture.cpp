@@ -1,17 +1,23 @@
 ﻿#include "VideoCapture.h"
 #include "log.h"
+#include <thread>
 
 
 VideoCapture::VideoCapture()
 {
-    initLogger(INFO);
 }
+
 VideoCapture::~VideoCapture()
 {
 }
 
 void VideoCapture::init()
 {
+    is_connected = false;
+    reconnect_attempts = 0;
+    max_reconnect_attempts = 3;
+    reconnect_interval = 1000;
+    reconnecting = false;
 	video_stream_index = -1;
 	av_format_ctx = nullptr;
 	av_codec_ctx = nullptr;
@@ -21,24 +27,25 @@ void VideoCapture::init()
 	avdevice_register_all();
 	avformat_network_init();
 	av_log_set_level(AV_LOG_FATAL);
-    LOG(INFO, "libCapture init success.");
+	LOG(INFO, "libCapture init success.");
 }
 
-bool VideoCapture::open(const char *url)
+bool VideoCapture::open(const char* url)
 {
+    re_url = url;
 	av_format_ctx = avformat_alloc_context();
 	if (!av_format_ctx) {
 		LOG(ERROR, "Couldn't create AVFormatContext");
 		return false;
 	}
-	
+
 	/* options rtsp*/
-	AVDictionary *opts = nullptr;
+	AVDictionary* opts = nullptr;
 	av_dict_set(&opts, "rtsp_transport", "tcp", 0);
 	av_dict_set(&opts, "buffer_size", "1024000", 0);
-	av_dict_set(&opts, "stimeout", "10000000", 0);
-	av_dict_set(&opts, "max_delay", "10000000", 0);
-	
+	av_dict_set(&opts, "stimeout", "1000000", 0);
+	av_dict_set(&opts, "max_delay", "1000000", 0);
+
 	if (avformat_open_input(&av_format_ctx, url, NULL, &opts) != 0) {
 		LOG(ERROR, "Could't open video url");
 		return false;
@@ -49,10 +56,10 @@ bool VideoCapture::open(const char *url)
 
 	/** @brief echo format info */
 	av_dump_format(av_format_ctx, NULL, NULL, false);
-	
-	AVCodecParameters *av_codec_params;
-	AVCodec *av_codec;
-	AVStream *av_stream;
+
+	AVCodecParameters* av_codec_params;
+	AVCodec* av_codec;
+	AVStream* av_stream;
 
 	for (uint32_t i = 0; i < av_format_ctx->nb_streams; ++i) {
 		av_stream = av_format_ctx->streams[i];
@@ -60,7 +67,7 @@ bool VideoCapture::open(const char *url)
 		av_codec = avcodec_find_decoder(av_codec_params->codec_id);
 		if (!av_codec)
 			continue;
-	
+
 		if (av_codec_params->codec_type == AVMEDIA_TYPE_VIDEO) {
 			video_stream_index = i;
 			width = av_codec_params->width;
@@ -75,8 +82,8 @@ bool VideoCapture::open(const char *url)
 		return false;
 	}
 
-    // Set up a codec context for the decoder
-    av_codec_ctx = avcodec_alloc_context3(av_codec);
+	// Set up a codec context for the decoder
+	av_codec_ctx = avcodec_alloc_context3(av_codec);
 	if (!av_codec_ctx) {
 		LOG(ERROR, "Couldn't create AVCodecContext");
 		return false;
@@ -101,15 +108,69 @@ bool VideoCapture::open(const char *url)
 		LOG(ERROR, "Couldn't allocate AVPacket");
 		return false;
 	}
-    LOG(INFO, "libCapture open url success.");
+	LOG(INFO, "libCapture open url success.");
+
+    is_connected = true;
 	return true;
+}
+
+bool VideoCapture::reconnect() {
+    if (reconnecting) {
+        LOG(INFO, "Already reconnecting...");
+        return false;
+    }
+
+    reconnecting = true;
+    close();
+
+    while (reconnect_attempts < max_reconnect_attempts) {
+        LOG(INFO, "Attempting to reconnect... (%d/%d)", reconnect_attempts + 1, max_reconnect_attempts);
+        if (open(re_url)) { 
+            reconnect_attempts = 0; // 重置重连次数
+            reconnecting = false;
+            LOG(INFO, "Reconnection successful.");
+            return true;
+        }
+
+        reconnect_attempts++;
+        std::this_thread::sleep_for(std::chrono::milliseconds(reconnect_interval)); // 线程休眠
+    }
+
+    reconnecting = false;
+    LOG(ERROR, "Failed to reconnect after %d attempts.", max_reconnect_attempts);
+    return false;
 }
 
 bool VideoCapture::decode(uint8_t *frame, int64_t *pts) {
     int response;
     char errStr[256] = {0};
 
-    while (av_read_frame(av_format_ctx, av_packet) >= 0) {
+    while (is_connected) {
+        int ret = av_read_frame(av_format_ctx, av_packet);
+        if (ret < 0) {
+            if (ret == AVERROR_EOF) {
+                LOG(INFO, "End of stream reached");
+                // 尝试重连
+                if (!reconnect()) {
+                    return false;
+                }
+                continue;
+            }
+            // 判断是否为连接错误
+            if (ret == AVERROR(EIO) || ret == AVERROR(ECONNRESET)) {
+                LOG(ERROR, "Network error detected, attempting to reconnect...");
+                // 尝试重连
+                if (!reconnect()) {
+                    return false;
+                }
+                continue;  // 重新尝试读取帧
+            }
+
+            av_strerror(ret, errStr, sizeof(errStr));
+            LOG(ERROR, "av_read_frame failed: %s", errStr);
+            return false;
+        }
+
         if (av_packet->stream_index != video_stream_index) {
             av_packet_unref(av_packet);
             continue;
@@ -120,7 +181,12 @@ bool VideoCapture::decode(uint8_t *frame, int64_t *pts) {
         if (response < 0) {
             av_strerror(response, errStr, sizeof(errStr));
             LOG(ERROR, "Failed to send packet: %s\n", errStr);
-            return false;
+
+            // 如果发送包失败，也尝试重连
+            if (!reconnect()) {
+                return false;
+            }
+            continue;
         }
 
         response = avcodec_receive_frame(av_codec_ctx, av_frame);
@@ -129,7 +195,12 @@ bool VideoCapture::decode(uint8_t *frame, int64_t *pts) {
         } else if (response < 0) {
             av_strerror(response, errStr, sizeof(errStr));
             LOG(ERROR, "Failed to receive frame: %s\n", errStr);
-            return false;
+
+            // 如果接收帧失败，也尝试重连
+            if (!reconnect()) {
+                return false;
+            }
+            continue;
         }
 
         *pts = av_frame->pts;
@@ -159,6 +230,7 @@ bool VideoCapture::decode(uint8_t *frame, int64_t *pts) {
         return true;
     }
 
+    // 检测到错误，尝试重连
     return false;
 }
 
@@ -178,7 +250,11 @@ bool VideoCapture::close()
 		av_frame_free(&av_frame);
 	}
 	avformat_network_deinit();
+
+
+    av_codec_ctx = nullptr;
+    av_packet = nullptr;
+    av_frame = nullptr;
+    is_connected = false;
 	return true;
 }
-
-
