@@ -228,7 +228,6 @@ bool VideoCapture::decode(uint8_t *frame, int64_t *pts) {
         return true;
     }
 
-    // 检测到错误，尝试重连
     return false;
 }
 
