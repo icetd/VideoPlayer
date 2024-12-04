@@ -202,7 +202,7 @@ bool VideoCapture::decode(uint8_t *frame, int64_t *pts) {
         }
 
         *pts = av_frame->pts;
-        
+
         // 初始化 SWS 上下文（仅当分辨率或像素格式变化时）
         if (!sws_scaler_ctx || av_frame->width != sws_width || av_frame->height != sws_height || av_codec_ctx->pix_fmt != sws_pix_fmt) {
             if (sws_scaler_ctx) 
@@ -221,44 +221,14 @@ bool VideoCapture::decode(uint8_t *frame, int64_t *pts) {
             sws_pix_fmt = av_codec_ctx->pix_fmt;
         }
 
-		// 为输出帧分配内存
-		AVFrame* out_frame = av_frame_alloc();
-		if (!out_frame) {
-			LOG(ERROR, "Couldn't allocate AVFrame for output\n");
-			return false;
-		}
-
-		// 设置输出帧的格式、宽度和高度
-		out_frame->format = AV_PIX_FMT_RGBA;  // 设置为 RGBA 格式
-		out_frame->width = av_frame->width;
-		out_frame->height = av_frame->height;
-
-
-		ret = av_frame_get_buffer(out_frame, 32);  // 分配内存，32是对齐值
-		if (ret < 0) {
-			LOG(ERROR, "Couldn't allocate buffer for output frame\n");
-			av_frame_free(&out_frame);
-			return false;
-		}
-
-		// 设置目标数据和行间隔
-		uint8_t* dest[4] = { out_frame->data[0], NULL, NULL, NULL };
-		int dest_linesize[4] = { av_frame->width * 4, 0, 0, 0 };  // RGBA格式，4字节每像素
-
-		// 使用 SWS 进行图像转换
-		int rows = sws_scale(sws_scaler_ctx, av_frame->data, av_frame->linesize, 0, av_frame->height, dest, dest_linesize);
-		if (rows < 0) {
-			LOG(ERROR, "sws_scale failed\n");
-			av_frame_free(&out_frame);
-			return false;
-		}
-        
-		memcpy(frame, out_frame->data[0], av_frame->width* av_frame->height * 4);
-
-		av_frame_free(&out_frame);
+        uint8_t *dest[4] = {frame, NULL, NULL, NULL};
+        int dest_linesize[4] = {av_frame->width * 4, 0, 0, 0};
+    
+        sws_scale(sws_scaler_ctx, av_frame->data, av_frame->linesize, 0, av_frame->height, dest, dest_linesize);
         return true;
     }
 
+    // 检测到错误，尝试重连
     return false;
 }
 
@@ -286,5 +256,3 @@ bool VideoCapture::close()
     is_connected = false;
 	return true;
 }
-
-
