@@ -150,20 +150,17 @@ bool VideoCapture::decode(uint8_t *frame, int64_t *pts) {
         if (ret < 0) {
             if (ret == AVERROR_EOF) {
                 LOG(INFO, "End of stream reached");
-                // 尝试重连
                 if (!reconnect()) {
                     return false;
                 }
                 continue;
             }
-            // 判断是否为连接错误
             if (ret == AVERROR(EIO) || ret == AVERROR(ECONNRESET)) {
                 LOG(ERROR, "Network error detected, attempting to reconnect...");
-                // 尝试重连
                 if (!reconnect()) {
                     return false;
                 }
-                continue;  // 重新尝试读取帧
+                continue;
             }
 
             av_strerror(ret, errStr, sizeof(errStr));
