@@ -29,6 +29,7 @@ public:
 	int getWidth() { return width; }
 	int getHeight() { return height; }
 
+    void setReconnect(bool status) { is_enable_reconnect = status; }
     void setReconnectParams(int maxAttempts, int intervalMs)
     {
         max_reconnect_attempts = maxAttempts;
@@ -54,7 +55,9 @@ private:
     int max_reconnect_attempts; // 最大重连次数
     int reconnect_interval;     // 重连间隔（毫秒）
     bool reconnecting;          // 是否正在重连
+    bool is_enable_reconnect;
     bool is_connected;
+
     const char *re_url;
 };
 
