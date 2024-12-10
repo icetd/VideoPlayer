@@ -20,6 +20,7 @@
 VideoView::VideoView() : 
     isStartCapture(false),
     isStart(false),
+    isSave(false),
     isDcodeSucceed(false),
     isShowPicture(false),
     m_VideoCapture(nullptr),
@@ -28,6 +29,7 @@ VideoView::VideoView() :
 {
     m_TexTure = std::make_unique<Texture>();
     m_VideoCapture = std::make_unique<VideoCapture>();
+    m_VideoPackage = std::make_unique<VideoPackage>();
 }
 
 VideoView::~VideoView()
@@ -56,6 +58,10 @@ void VideoView::OnUpdate()
 
         if (ImGui::Button(u8"停止", sz)) {
             isStart = false;
+            if (isSave) {
+                isSave = false; 
+                m_VideoPackage->stop();
+            }
         }
         if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
             ImGui::SetTooltip("Stop play rtps video.");
@@ -72,11 +78,25 @@ void VideoView::OnUpdate()
             saveFrameAsJPEG(m_FrameBuffer, m_VideoCapture->getWidth(), m_VideoCapture->getHeight(), 
                             "save/" + TimeStamp::now().toFormattedString(false) + ".jpg");
         }
-        
+
         if (ImGui::Button(u8"打开保存的照片", sz)) {
             IGFD::FileDialogConfig config;
             config.path = "./save";
             ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".jpg", config);
+        }
+
+        // 根据当前状态显示按钮文本
+        if (isSave) {
+            if (ImGui::Button(u8"停止录像", sz)) {
+                isSave = false; 
+                m_VideoPackage->stop();
+            }
+        } else {
+            if (ImGui::Button(u8"开始录像", sz) && isDcodeSucceed) {
+                isSave = true; 
+                std::string filename = "save/" + TimeStamp::now().toFormattedString(false) + ".mp4";
+                m_VideoPackage->start(filename.c_str(), m_VideoCapture->getWidth(), m_VideoCapture->getHeight());
+            }
         }
         // display
         if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey"))
@@ -89,6 +109,8 @@ void VideoView::OnUpdate()
         }
  
         ShowImagePopup(u8"预览", cur_picture_path, &isShowPicture);
+
+
         
         ImGui::NewLine();
         ImGui::Separator();
@@ -154,6 +176,9 @@ void VideoView::OnRender()
         dataMutex.lock();
         m_FrameBuffer = m_FrameBufferList.back();
         m_TexTure->bind(m_width, m_height, m_FrameBuffer.data());
+
+        if(isSave)
+            m_VideoPackage->saveVideo(m_FrameBuffer.data(), m_VideoCapture->getWidth(), m_VideoCapture->getHeight());
         m_FrameBufferList.pop_back();
         dataMutex.unlock();
     }
@@ -162,7 +187,7 @@ void VideoView::OnRender()
 void VideoView::OnImGuiRender()
 {
     ImVec2 viewportSize = ImGui::GetContentRegionAvail();
-    if (isStartCapture)
+    if (isStartCapture) 
         ImGui::Image((ImTextureID)(intptr_t)m_TexTure->getId(), ImVec2(viewportSize.x, viewportSize.y), ImVec2(0, 0), ImVec2(1, 1));
     else 
         ImGui::Image((ImTextureID)(intptr_t)0, ImVec2(viewportSize.x, viewportSize.y), ImVec2(1, 1), ImVec2(1, 1));
@@ -260,7 +285,8 @@ void VideoView::saveFrameAsJPEG(const std::vector<uint8_t>& frameData, int width
 
     JSAMPROW row_pointer[1];
     while (cinfo.next_scanline < cinfo.image_height) {
-        row_pointer[0] = &rgbData[cinfo.next_scanline * width * 3];
+        // 修正倒立问题：从最后一行开始往上写
+        row_pointer[0] = &rgbData[(cinfo.image_height - 1 - cinfo.next_scanline) * width * 3];
         jpeg_write_scanlines(&cinfo, row_pointer, 1);
     }
 
