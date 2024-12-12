@@ -29,6 +29,26 @@ void VideoCapture::init()
 	LOG(INFO, "libCapture init success.");
 }
 
+AVCodec *get_hardware_decoder(AVCodecID codec_id)
+{
+    // Iterate through available hardware decoders and choose the best available one
+    const char *hardware_decoders[] = {
+        "h264_cuvid", "h264_qsv", "h264_vaapi", "h264_videotoolbox", "h264_dxva2",
+        "hevc_cuvid", "hevc_qsv", "hevc_vaapi", "hevc_videotoolbox", "hevc_dxva2"};
+
+    for (const char *decoder_name : hardware_decoders)
+    {
+        AVCodec *decoder = avcodec_find_decoder_by_name(decoder_name);
+        if (decoder && decoder->id == codec_id) {
+            LOG(INFO, "Selected hardware decoder: %s", decoder_name);
+            return decoder;
+        }
+    }
+
+    LOG(ERROR, "No suitable hardware decoder found!");
+    return nullptr;
+}
+
 bool VideoCapture::open(const char* url)
 {
     re_url = url;
@@ -63,8 +83,8 @@ bool VideoCapture::open(const char* url)
 	for (uint32_t i = 0; i < av_format_ctx->nb_streams; ++i) {
 		av_stream = av_format_ctx->streams[i];
 		av_codec_params = av_format_ctx->streams[i]->codecpar;
-		av_codec = avcodec_find_decoder(av_codec_params->codec_id);
-		if (!av_codec)
+        av_codec = get_hardware_decoder(av_codec_params->codec_id);
+        if (!av_codec)
 			continue;
 
 		if (av_codec_params->codec_type == AVMEDIA_TYPE_VIDEO) {

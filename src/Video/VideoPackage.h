@@ -26,7 +26,7 @@ public:
 private:
 	int out_width = 640;
 	int out_height = 480;
-	int frame_rate = 24;
+	int frame_rate = 15;
 	int bitrate = 3000000;
 
 	AVOutputFormat* ofmt = nullptr;
