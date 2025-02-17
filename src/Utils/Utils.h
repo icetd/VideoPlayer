@@ -111,7 +111,7 @@ struct AppLog
 		ImGui::SameLine();
 		bool clear = ImGui::Button(u8"clear");
 		ImGui::SameLine(0, 20);
-		Filter.Draw(u8"", -100.0f);
+		Filter.Draw(u8"##", -100.0f);
 
 		ImGui::Separator();
 

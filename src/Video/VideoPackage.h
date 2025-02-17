@@ -24,9 +24,9 @@ public:
 	void saveVideo(const uint8_t* picture_buf, int in_width, int in_height);
 	void stop();
 private:
-	int out_width = 640;
-	int out_height = 480;
-	int frame_rate = 15;
+	int out_width = 2560;
+	int out_height = 1440;
+	int frame_rate = 10;
 	int bitrate = 3000000;
 
 	AVOutputFormat* ofmt = nullptr;
