@@ -1,4 +1,4 @@
-#include "video/VideoPackage.h"
+#include "VideoPackage.h"
 #include <log.h>
 
 VideoPackage::VideoPackage()
