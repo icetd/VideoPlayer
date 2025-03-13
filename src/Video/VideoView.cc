@@ -12,12 +12,13 @@
 #include <sys/stat.h>
 #endif
 
-#define IMGUI_DEMO_MARKER(section)  \
-    do { if (GImGuiDemoMarkerCallback != NULL) \
+#define IMGUI_DEMO_MARKER(section)                                                                   \
+    do {                                                                                             \
+        if (GImGuiDemoMarkerCallback != NULL)                                                        \
             GImGuiDemoMarkerCallback(__FILE__, __LINE__, section, GImGuiDemoMarkerCallbackUserData); \
     } while (0)
 
-VideoView::VideoView() : 
+VideoView::VideoView() :
     isStartCapture(false),
     isStart(false),
     isSave(false),
@@ -34,8 +35,8 @@ VideoView::VideoView() :
 
 VideoView::~VideoView()
 {
-    if(isStartCapture) 
-       stopPlay(); 
+    if (isStartCapture)
+        stopPlay();
 }
 
 void VideoView::OnUpdate()
@@ -47,7 +48,7 @@ void VideoView::OnUpdate()
 
         static char str1[128] = "";
         ImGui::InputTextWithHint("input url", "set rtsp url here", m_url, IM_ARRAYSIZE(m_url));
-        
+
         ImGui::NewLine();
         ImVec2 sz = ImVec2(-FLT_MIN, 0.0f);
         if (ImGui::Button(u8"开始", sz)) {
@@ -59,7 +60,7 @@ void VideoView::OnUpdate()
         if (ImGui::Button(u8"停止", sz)) {
             isStart = false;
             if (isSave) {
-                isSave = false; 
+                isSave = false;
                 m_VideoPackage->stop();
             }
         }
@@ -71,11 +72,10 @@ void VideoView::OnUpdate()
         ImGui::SameLine();
         ImGui::TextColored(ImVec4(255, 0, 0, 255), "%s", (isStart ? "Start" : "Stop"));
 
-
         ImGui::Separator();
         ImGui::NewLine();
         if (ImGui::Button(u8"拍照", sz) && isDcodeSucceed) {
-            saveFrameAsJPEG(m_FrameBuffer, m_VideoCapture->getWidth(), m_VideoCapture->getHeight(), 
+            saveFrameAsJPEG(m_FrameBuffer, m_VideoCapture->getWidth(), m_VideoCapture->getHeight(),
                             "save/" + TimeStamp::now().toFormattedString(false) + ".jpg");
         }
 
@@ -88,44 +88,41 @@ void VideoView::OnUpdate()
         // 根据当前状态显示按钮文本
         if (isSave) {
             if (ImGui::Button(u8"停止录像", sz)) {
-                isSave = false; 
+                isSave = false;
                 m_VideoPackage->stop();
             }
         } else {
             if (ImGui::Button(u8"开始录像", sz) && isDcodeSucceed) {
-                isSave = true; 
+                isSave = true;
                 std::string filename = "save/" + TimeStamp::now().toFormattedString(false) + ".mp4";
                 m_VideoPackage->start(filename.c_str(), m_VideoCapture->getWidth(), m_VideoCapture->getHeight());
             }
         }
         // display
-        if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey"))
-        {
+        if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
             if (ImGuiFileDialog::Instance()->IsOk()) { // action if OK
                 cur_picture_path = ImGuiFileDialog::Instance()->GetFilePathName();
                 isShowPicture = true;
             }
             ImGuiFileDialog::Instance()->Close();
         }
- 
+
         ShowImagePopup(u8"预览", cur_picture_path, &isShowPicture);
 
-
-        
         ImGui::NewLine();
         ImGui::Separator();
         ImGui::ShowStyleSelector("Theme");
         ImGui::NewLine();
 
-	    ImGui::TextColored(ImVec4(0, 255, 0, 255),u8"%s", TimeStamp::now().toFormattedString().c_str()); 
+        ImGui::TextColored(ImVec4(0, 255, 0, 255), u8"%s", TimeStamp::now().toFormattedString().c_str());
 
-	    ImGui::TextColored(ImVec4(0, 255, 0, 255),"Application average %.3f ms/frame (%.1f FPS)", 
-                                1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::TextColored(ImVec4(0, 255, 0, 255), "Application average %.3f ms/frame (%.1f FPS)",
+                           1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
         ImGui::PopItemWidth();
         ImGui::End();
     }
-    
+
     {
         ImGui::Begin("View");
         OnImGuiRender();
@@ -142,23 +139,21 @@ void VideoView::OnUpdate()
 
 void VideoView::run()
 {
-    while(!this->isStoped()) {
-
-        if(isStart == true && isStartCapture == false ) {
+    while (!this->isStoped()) {
+        if (isStart == true && isStartCapture == false) {
             startPlay();
         } else if (isStart == false && isStartCapture == true) {
             stopPlay();
         }
 
-        if (isStartCapture)
-        {
+        if (isStartCapture) {
             int length = m_width * m_height * 4;
             m_data = (uint8_t *)realloc(m_data, length);
             m_pts = 1;
             isDcodeSucceed = m_VideoCapture->decode(m_data, &m_pts);
             if (isDcodeSucceed) {
                 std::unique_lock<std::mutex> lock(dataMutex);
-                if (m_FrameBufferList.size() > 2) {    // set max buffer size
+                if (m_FrameBufferList.size() > 2) { // set max buffer size
                     m_FrameBufferList.erase(m_FrameBufferList.begin());
                 }
                 m_FrameBufferList.emplace_back(m_data, m_data + length);
@@ -177,7 +172,7 @@ void VideoView::OnRender()
         m_FrameBuffer = m_FrameBufferList.back();
         m_TexTure->bind(m_width, m_height, m_FrameBuffer.data());
 
-        if(isSave)
+        if (isSave)
             m_VideoPackage->saveVideo(m_FrameBuffer.data(), m_VideoCapture->getWidth(), m_VideoCapture->getHeight());
         m_FrameBufferList.pop_back();
         dataMutex.unlock();
@@ -187,9 +182,9 @@ void VideoView::OnRender()
 void VideoView::OnImGuiRender()
 {
     ImVec2 viewportSize = ImGui::GetContentRegionAvail();
-    if (isStartCapture) 
+    if (isStartCapture)
         ImGui::Image((ImTextureID)(intptr_t)m_TexTure->getId(), ImVec2(viewportSize.x, viewportSize.y), ImVec2(0, 0), ImVec2(1, 1));
-    else 
+    else
         ImGui::Image((ImTextureID)(intptr_t)0, ImVec2(viewportSize.x, viewportSize.y), ImVec2(1, 1), ImVec2(1, 1));
 }
 
@@ -200,9 +195,9 @@ void VideoView::startPlay()
     re = m_VideoCapture->open(m_url);
     if (!re) {
         isStart = false;
-        return; 
+        return;
     }
-    m_data = (uint8_t*)malloc(0);
+    m_data = (uint8_t *)malloc(0);
     m_width = m_VideoCapture->getWidth();
     m_height = m_VideoCapture->getHeight();
     isStartCapture = true;
@@ -217,7 +212,7 @@ void VideoView::stopPlay()
     m_data = nullptr;
 }
 
-void createDirectory(const std::string& dirPath)
+void createDirectory(const std::string &dirPath)
 {
 #ifdef WIN32
     // Windows 系统创建目录
@@ -236,7 +231,7 @@ void createDirectory(const std::string& dirPath)
 #endif
 }
 
-void VideoView::saveFrameAsJPEG(const std::vector<uint8_t>& frameData, int width, int height, const std::string& filename)
+void VideoView::saveFrameAsJPEG(const std::vector<uint8_t> &frameData, int width, int height, const std::string &filename)
 {
     // 提取文件的目录路径
     size_t pos = filename.find_last_of("/\\");
@@ -253,7 +248,7 @@ void VideoView::saveFrameAsJPEG(const std::vector<uint8_t>& frameData, int width
     cinfo.err = jpeg_std_error(&jerr);
     jpeg_create_compress(&cinfo);
 
-    FILE* outfile = fopen(filename.c_str(), "wb");
+    FILE *outfile = fopen(filename.c_str(), "wb");
     if (!outfile) {
         fprintf(stderr, "Error opening output JPEG file %s\n", filename.c_str());
         return;
@@ -271,7 +266,7 @@ void VideoView::saveFrameAsJPEG(const std::vector<uint8_t>& frameData, int width
 
     jpeg_start_compress(&cinfo, TRUE);
 
-    if (frameData.size() == 0) 
+    if (frameData.size() == 0)
         return;
 
     std::unique_lock<std::mutex> lock(dataMutex);
@@ -297,7 +292,7 @@ void VideoView::saveFrameAsJPEG(const std::vector<uint8_t>& frameData, int width
     m_log.AddLog(u8"Saved frame as JPEG: %s\n", filename.c_str());
 }
 
-void VideoView::ShowImagePopup(const char* popup_title, const std::string &path, bool* is_open)
+void VideoView::ShowImagePopup(const char *popup_title, const std::string &path, bool *is_open)
 {
     if (*is_open) {
         ImGui::OpenPopup(popup_title);
@@ -310,7 +305,7 @@ void VideoView::ShowImagePopup(const char* popup_title, const std::string &path,
 
         // 添加按钮，点击后关闭弹窗
         if (ImGui::Button(u8"退出")) {
-            *is_open = false;  // 更新控制变量
+            *is_open = false; // 更新控制变量
             ImGui::CloseCurrentPopup();
         }
 
