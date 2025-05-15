@@ -6,11 +6,13 @@
 class TimeStamp
 {
 public:
-    TimeStamp() : m_micro_seconds_since_epoch(0)
+    TimeStamp() :
+        m_micro_seconds_since_epoch(0)
     {
     }
 
-    explicit TimeStamp(int64_t microSecondsSinceEpoch) : m_micro_seconds_since_epoch(microSecondsSinceEpoch)
+    explicit TimeStamp(int64_t microSecondsSinceEpoch) :
+        m_micro_seconds_since_epoch(microSecondsSinceEpoch)
     {
     }
 

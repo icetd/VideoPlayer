@@ -8,9 +8,9 @@
 class Texture
 {
 public:
-	Texture();
+    Texture();
     Texture(const std::string filepathname, std::string texType, bool isPgm);
-	~Texture();
+    ~Texture();
 
     void bind(int width, int height, uint8_t *rgbData);
     void unbind() const;
@@ -21,7 +21,6 @@ private:
     std::string m_type;
     bool m_isPgm;
     std::string m_filepathName;
-
 };
 
 #endif

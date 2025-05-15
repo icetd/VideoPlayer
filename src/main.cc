@@ -1,4 +1,4 @@
-﻿//#pragma comment( linker, "/subsystem:windows /entry:mainCRTStartup")
+﻿// #pragma comment( linker, "/subsystem:windows /entry:mainCRTStartup")
 
 #include <iostream>
 #include "log.h"
@@ -10,7 +10,6 @@
 #if VLD
 #include <vld.h>
 #endif
-
 
 int main(int argc, char **argv)
 {

@@ -6,7 +6,7 @@
 #include <GLFW/glfw3.h>
 #include "VideoView.h"
 
-class Application 
+class Application
 {
 public:
     Application(const char *appName, int w, int h);
@@ -14,6 +14,7 @@ public:
 
     void run();
     void wait();
+
 private:
     std::string m_appName;
     GLFWwindow *m_window;
@@ -29,6 +30,5 @@ private:
     int m_width;
     int m_height;
 };
-
 
 #endif

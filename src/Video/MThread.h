@@ -8,24 +8,24 @@
 class MThread
 {
 public:
-	MThread();
-	virtual ~MThread();
-	
-	std::thread::id getId();
+    MThread();
+    virtual ~MThread();
 
-	void start();
-	void detach();
-	void stop();
-	void join();
-	void sleep(int sec);
-	void sleepMs(int msec);
-	bool isStoped();
+    std::thread::id getId();
 
-	virtual void run() = 0;
+    void start();
+    void detach();
+    void stop();
+    void join();
+    void sleep(int sec);
+    void sleepMs(int msec);
+    bool isStoped();
+
+    virtual void run() = 0;
 
 private:
-	std::atomic<bool> stopState;
-	std::thread th;
+    std::atomic<bool> stopState;
+    std::thread th;
 };
 
 #endif

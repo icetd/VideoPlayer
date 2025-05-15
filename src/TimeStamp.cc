@@ -6,7 +6,7 @@
 #endif
 
 static_assert(sizeof(TimeStamp) == sizeof(int64_t),
-    "TimeStamp should be same as int64_t");
+              "TimeStamp should be same as int64_t");
 
 std::string TimeStamp::toString() const
 {
@@ -29,9 +29,9 @@ std::string TimeStamp::toFormattedString(bool showMicroseconds) const
 
     // 东八区偏移量：UTC+8，即 8小时 = 8 * 3600秒 = 28800秒
     int timezoneOffsetSeconds = 8 * 3600;
-    
+
     // 手动调整时区
-    tm_time.tm_hour += timezoneOffsetSeconds / 3600; // 加上小时偏移
+    tm_time.tm_hour += timezoneOffsetSeconds / 3600;       // 加上小时偏移
     tm_time.tm_min += (timezoneOffsetSeconds % 3600) / 60; // 加上分钟偏移
 
     // 处理溢出，确保时间在合理范围内
