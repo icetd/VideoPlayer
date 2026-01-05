@@ -1076,7 +1076,7 @@ bool IGFD::Utils::M_ExtractNumFromStringAtPos(const std::string& str, size_t& po
     return false;
 }
 
-// Fonction de comparaison naturelle entre deux cha�nes
+// Fonction de comparaison naturelle entre deux chanes
 bool IGFD::Utils::NaturalCompare(const std::string& vA, const std::string& vB, bool vInsensitiveCase, bool vDescending) {
     std::size_t ia = 0, ib = 0;
     double nA, nB;

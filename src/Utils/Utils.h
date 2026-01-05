@@ -1,8 +1,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <imgui.h>
-#include <imgui_internal.h>
+#include "../Core/Layer.h"
+#include <codecvt>
 
 struct Utils
 {
@@ -36,7 +36,7 @@ struct ScrollingBuffer {
     int MaxSize;
     int Offset;
     ImVector<ImVec2> Data;
-    ScrollingBuffer(int max_size = 2000) {
+    ScrollingBuffer(int max_size = 6000) {
         MaxSize = max_size;
         Offset  = 0;
         Data.reserve(MaxSize);
@@ -63,7 +63,7 @@ struct RollingBuffer {
     ImVector<ImVec2> Data;
     RollingBuffer() {
         Span = 10.0f;
-        Data.reserve(2000);
+        Data.reserve(6000);
     }
     void AddPoint(float x, float y) {
         float xmod = fmodf(x, Span);
@@ -109,9 +109,9 @@ struct AppLog
 		}
 
 		ImGui::SameLine();
-		bool clear = ImGui::Button(u8"clear");
+		bool clear = ImGui::Button(u8"清空");
 		ImGui::SameLine(0, 20);
-		Filter.Draw(u8"##", -100.0f);
+		Filter.Draw(u8"过滤", -100.0f);
 
 		ImGui::Separator();
 
@@ -154,6 +154,40 @@ struct AppLog
 	}
 };
 
+static void MToggleButton(const char* str_id, bool* v)
+{
+    ImVec2 p = ImGui::GetCursorScreenPos();
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+    float height = ImGui::GetFrameHeight();
+    float width = height * 2.55f;
+    float radius = height * 0.50f;
+
+    ImGui::InvisibleButton(str_id, ImVec2(width, height));
+    if (ImGui::IsItemClicked())
+        *v = !*v;
+
+    float t = *v ? 1.0f : 0.0f;
+
+    ImGuiContext& g = *GImGui;
+    float ANIM_SPEED = 0.08f;
+    if (g.LastActiveId == g.CurrentWindow->GetID(str_id))// && g.LastActiveIdTimer < ANIM_SPEED)
+    {
+        float t_anim = ImSaturate(g.LastActiveIdTimer / ANIM_SPEED);
+        t = *v ? (t_anim) : (1.0f - t_anim);
+    }
+
+    ImU32 col_bg;
+    if (ImGui::IsItemHovered())
+        col_bg = ImGui::GetColorU32(ImLerp(ImVec4(0.78f, 0.78f, 0.78f, 1.0f), ImVec4(0.54f, 0.24f, 0.13f, 1.0f), t));
+    else
+        col_bg = ImGui::GetColorU32(ImLerp(ImVec4(0.85f, 0.85f, 0.85f, 1.0f), ImVec4(0.54f, 0.26f, 0.13f, 1.0f), t));
+
+    draw_list->AddRectFilled(p, ImVec2(p.x + width, p.y + height), col_bg, height * 0.5f);
+    draw_list->AddCircleFilled(ImVec2(p.x + radius + t * (width - radius * 2.0f), p.y + radius), radius - 1.5f, IM_COL32(255, 255, 255, 255));
+}
+
+
 static void ShowErrorPopup(const char* popup_title, const char* message, bool* is_open) {
     if (*is_open) {
         ImGui::OpenPopup(popup_title);
@@ -171,4 +205,14 @@ static void ShowErrorPopup(const char* popup_title, const char* message, bool* i
         ImGui::EndPopup();
     }
 }
+
+static std::string TBS(std::string &str)
+{
+    typedef std::codecvt_byname<wchar_t, char, std::mbstate_t> F;
+    static std::wstring_convert<F> strC(new F("Chinese"));
+    static std::wstring_convert<std::codecvt_utf8<wchar_t>> strCnv;
+    return strCnv.to_bytes(strC.from_bytes(str));
+}
+
+
 #endif

@@ -1,9 +1,12 @@
-﻿// #pragma comment( linker, "/subsystem:windows /entry:mainCRTStartup")
-
+#pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
 #include <iostream>
-#include "log.h"
-#include "Application.h"
-#include "TimeStamp.h"
+#include <string>
+#include <fstream>
+#include "Core/Application.h"
+#include "Core/log.h"
+#include "Ui/MainLayer.h"
+#include "Ui/LogLayer.h"
+#include "Ui/VideoLayer.h"
 
 #define VLD 0
 
@@ -14,8 +17,12 @@
 int main(int argc, char **argv)
 {
     initLogger(INFO);
-    Application app("VideoPlayer", 1160, 720);
-    app.run();
-    app.wait();
+    Application *app = new Application("VideoViewer", 1920, 1080);
+    app->PushLayer<MainLayer>();
+    app->PushLayer<LogLayer>();
+    app->PushLayer<VideoLayer>();
+    app->Run();
+
+ //   delete app;
     return 0;
 }
