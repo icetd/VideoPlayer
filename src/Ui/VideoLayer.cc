@@ -80,9 +80,7 @@ void VideoLayer::ShowVideoControl()
         saveFrameAsJPEG(m_dataBuffer, m_VideoThread->GetWidth(), m_VideoThread->GetHeight(), 
                         "save/" + TimeStamp::now().toFormattedString(false) + ".jpg");
     }
-
-    ImGui::Separator();
-    ImGui::NewLine();
+    
     // 根据当前状态显示按钮文本
     if (isSave) {
         if (ImGui::Button(u8"停止录像", sz)) {
@@ -96,9 +94,6 @@ void VideoLayer::ShowVideoControl()
             m_VideoPackage->start(filename.c_str(), m_VideoThread->GetWidth(), m_VideoThread->GetHeight());
         }
     }
-
-    ImGui::Separator();
-    ImGui::NewLine();
 
     if (ImGui::Button(u8"预览保存的图片", sz)) {
         IGFD::FileDialogConfig config;
@@ -139,6 +134,9 @@ void VideoLayer::ShowVideoControl()
 
     m_VideoThreadShow->SetStartStatus((int)isShowVideo);
     ShowVideoPopup(u8"预览视频", cur_video_path, &isShowVideo);
+ 
+    ImGui::Separator();
+    ImGui::NewLine();
 
     ImGui::TextColored(ImVec4(0.1f, 0.5f, 0.1f, 1.0f), "Application average %.3f ms/frame (%.1f FPS)",
 					   1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
