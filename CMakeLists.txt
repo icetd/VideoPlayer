@@ -8,7 +8,7 @@ add_subdirectory(thirdparty/glm)
 add_definitions(-w)
 add_definitions(-DPROTOBUF_USE_DLLS)
 
-set (CMKAE_CXX_STANDARD 14)
+set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_BUILD_TYPE Release)
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
