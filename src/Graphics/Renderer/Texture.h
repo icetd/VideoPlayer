@@ -43,6 +43,8 @@ private:
     std::string m_filename;
     std::string m_filepathName;
     std::string m_tempname;
+    int m_width = 0;
+    int m_height = 0;
 
 };
 

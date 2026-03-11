@@ -1,4 +1,4 @@
-#pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
+//#pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
 #include <iostream>
 #include <string>
 #include <fstream>
