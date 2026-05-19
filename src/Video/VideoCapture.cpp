@@ -357,10 +357,6 @@ bool VideoCapture::decode(uint8_t *frame, int64_t *pts)
 
 bool VideoCapture::close()
 {
-    is_connected = false;
-    is_enable_reconnect = false;
-    reconnecting = false;
-
     if (av_packet) {
         av_packet_free(&av_packet);
     }
@@ -376,8 +372,6 @@ bool VideoCapture::close()
     if (av_format_ctx) {
         avformat_close_input(&av_format_ctx);
     }
-
-    avformat_network_deinit();
 
     av_format_ctx = nullptr;
     av_codec_ctx = nullptr;
