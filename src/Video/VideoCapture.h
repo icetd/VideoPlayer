@@ -10,6 +10,7 @@ extern "C" {
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
 #include <libavdevice/avdevice.h>
+#include <libavutil/imgutils.h>
 
 #ifdef __cplusplus
 }
@@ -65,6 +66,7 @@ private:
     bool is_connected;
 
     const char *re_url;
+    int64_t m_frame_counter;
 };
 
 #endif
