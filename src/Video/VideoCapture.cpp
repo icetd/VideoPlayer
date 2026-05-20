@@ -189,8 +189,8 @@ bool VideoCapture::decode(uint8_t *frame, int64_t *pts)
         if (ret < 0) {
             av_packet_unref(av_packet);
 
-            if (ret == AVERROR_EOF) {
-                LOG(INFO, "decode: End of stream reached");
+            if (ret== AVERROR_EOF || ret == AVERROR_EXIT) {
+                LOG(INFO, "decode: End of stream or exit signal reached (err=%d)", ret);
                 if (is_enable_reconnect && reconnect()) {
                     continue;
                 }
@@ -267,6 +267,12 @@ bool VideoCapture::decode(uint8_t *frame, int64_t *pts)
         }
 
         // ========== 4. Successfully got a frame ==========
+        if (av_frame->format < 0 || av_frame->format >= AV_PIX_FMT_NB || av_frame->width <= 0 || av_frame->height <= 0) {
+            LOG(ERRO, "decode: Corrupted frame format(%d) or size(%dx%d) on sudden disconnect", 
+                av_frame->format, av_frame->width, av_frame->height);
+            av_frame_unref(av_frame);
+            continue; 
+        }
 
         // ----- 4.1 Validate frame data integrity -----
         if (!av_frame->data[0] || !av_frame->buf[0]) {
@@ -292,7 +298,7 @@ bool VideoCapture::decode(uint8_t *frame, int64_t *pts)
 
         // ----- 4.3 Handle resolution changes -----
         bool resolution_changed = (av_frame->width != sws_width || av_frame->height != sws_height);
-        bool pix_fmt_changed = (av_codec_ctx->pix_fmt != sws_pix_fmt);
+        bool pix_fmt_changed = (av_frame->format != sws_pix_fmt);
 
         if (resolution_changed) {
             LOG(INFO, "decode: Resolution changed: %dx%d -> %dx%d",
