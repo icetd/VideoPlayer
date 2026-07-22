@@ -75,7 +75,13 @@ bool VideoCapture::open(const char *url)
             video_stream_index = i;
             width = av_codec_params->width;
             height = av_codec_params->height;
-            fps = av_stream->avg_frame_rate.num / av_stream->avg_frame_rate.den;
+            if (av_stream->avg_frame_rate.den > 0) {
+                fps = av_stream->avg_frame_rate.num / av_stream->avg_frame_rate.den;
+            } else {
+                if (av_stream->r_frame_rate.den > 0) {
+                    fps = av_stream->r_frame_rate.num / av_stream->r_frame_rate.den;
+                }
+            }
             time_base = av_format_ctx->streams[i]->time_base;
             break;
         }
