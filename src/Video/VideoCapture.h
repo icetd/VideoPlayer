@@ -67,6 +67,9 @@ private:
 
     const char *re_url;
     int64_t m_frame_counter;
+    int m_interruptFlag;
+
+    static int InterruptCB(void* ctx);
 };
 
 #endif

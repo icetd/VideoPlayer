@@ -10,6 +10,10 @@ VideoCapture::~VideoCapture()
 {
 }
 
+int VideoCapture::InterruptCB(void* ctx) {
+    return *(int*)ctx;
+}
+
 void VideoCapture::init()
 {
     is_connected = false;
@@ -23,6 +27,7 @@ void VideoCapture::init()
     av_frame = nullptr;
     av_packet = nullptr;
     sws_scaler_ctx = nullptr;
+    m_interruptFlag = 0;
     avdevice_register_all();
     avformat_network_init();
     av_log_set_level(AV_LOG_FATAL);
@@ -37,6 +42,10 @@ bool VideoCapture::open(const char *url)
         LOG(ERRO, "Couldn't create AVFormatContext");
         return false;
     }
+
+    m_interruptFlag = 0;
+    av_format_ctx->interrupt_callback.callback = InterruptCB;
+    av_format_ctx->interrupt_callback.opaque = &m_interruptFlag;
 
     /* options rtsp*/
     AVDictionary *opts = nullptr;
@@ -369,6 +378,8 @@ bool VideoCapture::decode(uint8_t *frame, int64_t *pts)
 
 bool VideoCapture::close()
 {
+    m_interruptFlag = 1;
+
     if (av_packet) {
         av_packet_free(&av_packet);
     }
