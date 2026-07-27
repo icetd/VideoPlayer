@@ -63,8 +63,8 @@ void VideoThread::run()
 				OnRenderDataCallback(std::vector<uint8_t>(m_data, m_data + lenght));
 			}
             
-            if ((m_VideoCapture->getInputType() == "rtsp") |
-                (m_VideoCapture->getInputType() == "rtmp") |
+            if ((m_VideoCapture->getInputType() == "rtsp") ||
+                (m_VideoCapture->getInputType() == "rtmp") ||
                 (m_VideoCapture->getInputType() == "http")) {
 			    this->sleepMs(10);
             } else {

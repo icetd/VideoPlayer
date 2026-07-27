@@ -8,6 +8,7 @@ VideoCapture::VideoCapture()
 
 VideoCapture::~VideoCapture()
 {
+    close();
 }
 
 int VideoCapture::InterruptCB(void* ctx) {
@@ -56,7 +57,7 @@ bool VideoCapture::open(const char *url)
 
     if (avformat_open_input(&av_format_ctx, url, NULL, &opts) != 0) {
         LOG(ERRO, "Could't open video url %s", url);
-        return false;
+        goto cleanup;
     }
     avformat_find_stream_info(av_format_ctx, NULL);
     int totalMs = av_format_ctx->duration / (AV_TIME_BASE / 1000);
@@ -98,39 +99,58 @@ bool VideoCapture::open(const char *url)
 
     if (video_stream_index == -1) {
         LOG(ERRO, "Couldn't find valid video stream from url");
-        return false;
+        goto cleanup;
     }
 
     // Set up a codec context for the decoder
     av_codec_ctx = avcodec_alloc_context3(av_codec);
     if (!av_codec_ctx) {
         LOG(ERRO, "Couldn't create AVCodecContext");
-        return false;
+        goto cleanup;
     }
 
     if (avcodec_parameters_to_context(av_codec_ctx, av_codec_params) < 0) {
         LOG(ERRO, "Couldn't initialize AVCodecContext");
-        return false;
+        goto cleanup;
     }
     if (avcodec_open2(av_codec_ctx, av_codec, NULL) < 0) {
         LOG(ERRO, "Couldn't open codec");
-        return false;
+        goto cleanup;
     }
 
     av_frame = av_frame_alloc();
     if (!av_frame) {
         LOG(ERRO, "Couldn't allocate AVFrame");
-        return false;
+        goto cleanup;
     }
     av_packet = av_packet_alloc();
     if (!av_packet) {
         LOG(ERRO, "Couldn't allocate AVPacket");
-        return false;
+        goto cleanup;
     }
     LOG(INFO, "libCapture open url success.");
 
     is_connected = true;
     return true;
+
+cleanup:
+    if (av_packet) {
+        av_packet_free(&av_packet);
+    }
+    if (av_frame) {
+        av_frame_free(&av_frame);
+    }
+    if (av_codec_ctx) {
+        avcodec_free_context(&av_codec_ctx);
+    }
+    if (av_format_ctx) {
+        avformat_close_input(&av_format_ctx);
+    }
+    av_format_ctx = nullptr;
+    av_codec_ctx = nullptr;
+    av_frame = nullptr;
+    av_packet = nullptr;
+    return false;
 }
 
 bool VideoCapture::reconnect()
@@ -379,6 +399,7 @@ bool VideoCapture::decode(uint8_t *frame, int64_t *pts)
 bool VideoCapture::close()
 {
     m_interruptFlag = 1;
+    is_connected = false;
 
     if (av_packet) {
         av_packet_free(&av_packet);
@@ -394,6 +415,11 @@ bool VideoCapture::close()
 
     if (av_format_ctx) {
         avformat_close_input(&av_format_ctx);
+    }
+
+    if (sws_scaler_ctx) {
+        sws_freeContext(sws_scaler_ctx);
+        sws_scaler_ctx = nullptr;
     }
 
     av_format_ctx = nullptr;
