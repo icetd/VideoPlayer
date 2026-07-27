@@ -222,15 +222,15 @@ bool VideoCapture::decode(uint8_t *frame, int64_t *pts)
         int ret = av_read_frame(av_format_ctx, av_packet);
 
         if (ret < 0) {
-            av_packet_unref(av_packet);
-
-            if (ret== AVERROR_EOF || ret == AVERROR_EXIT) {
+            if (ret == AVERROR_EOF || ret == AVERROR_EXIT) {
                 LOG(INFO, "decode: End of stream or exit signal reached (err=%d)", ret);
                 if (is_enable_reconnect && reconnect()) {
                     continue;
                 }
                 return false;
             }
+
+            av_packet_unref(av_packet);
 
             if (ret == AVERROR(EIO) || ret == AVERROR(ECONNRESET) || ret == AVERROR(ETIMEDOUT) || 
                 ret == AVERROR(ENETRESET) || ret == AVERROR(ENETUNREACH) || ret == -110) {
