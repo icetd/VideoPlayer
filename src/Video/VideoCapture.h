@@ -18,19 +18,20 @@ extern "C" {
 
 #include <string>
 
-class VideoCapture {
+class VideoCapture
+{
 public:
-	VideoCapture();
-	~VideoCapture();
-	void init();
-	bool open(const char* url);
-	bool decode(uint8_t* frame, int64_t* pts);
-	bool close();
+    VideoCapture();
+    ~VideoCapture();
+    void init();
+    bool open(const char *url);
+    bool decode(uint8_t *frame, int64_t *pts);
+    bool close();
 
     bool reconnect();
 
-	int getWidth() { return width; }
-	int getHeight() { return height; }
+    int getWidth() { return width; }
+    int getHeight() { return height; }
     int getFps() { return fps; }
     std::string &getInputType() { return input_type; }
 
@@ -42,22 +43,22 @@ public:
     }
 
 private:
-	int width;
-	int height;
+    int width;
+    int height;
     int fps;
     std::string input_type;
 
-	int video_stream_index;
-	AVRational time_base;
-	AVFormatContext* av_format_ctx;
-	AVCodecContext* av_codec_ctx;
-	AVFrame* av_frame;
-	AVPacket* av_packet;
+    int video_stream_index;
+    AVRational time_base;
+    AVFormatContext *av_format_ctx;
+    AVCodecContext *av_codec_ctx;
+    AVFrame *av_frame;
+    AVPacket *av_packet;
     SwsContext *sws_scaler_ctx;
     int sws_width = 0;
     int sws_height = 0;
     AVPixelFormat sws_pix_fmt;
-    
+
     int reconnect_attempts;     // 当前重连尝试次数
     int max_reconnect_attempts; // 最大重连次数
     int reconnect_interval;     // 重连间隔（毫秒）
@@ -69,7 +70,7 @@ private:
     int64_t m_frame_counter;
     int m_interruptFlag;
 
-    static int InterruptCB(void* ctx);
+    static int InterruptCB(void *ctx);
 };
 
 #endif

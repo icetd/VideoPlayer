@@ -11,8 +11,9 @@ VideoCapture::~VideoCapture()
     close();
 }
 
-int VideoCapture::InterruptCB(void* ctx) {
-    return *(int*)ctx;
+int VideoCapture::InterruptCB(void *ctx)
+{
+    return *(int *)ctx;
 }
 
 void VideoCapture::init()
@@ -232,7 +233,7 @@ bool VideoCapture::decode(uint8_t *frame, int64_t *pts)
 
             av_packet_unref(av_packet);
 
-            if (ret == AVERROR(EIO) || ret == AVERROR(ECONNRESET) || ret == AVERROR(ETIMEDOUT) || 
+            if (ret == AVERROR(EIO) || ret == AVERROR(ECONNRESET) || ret == AVERROR(ETIMEDOUT) ||
                 ret == AVERROR(ENETRESET) || ret == AVERROR(ENETUNREACH) || ret == -110) {
                 LOG(ERRO, "decode: Network error (err=%d), reconnecting...", ret);
                 if (is_enable_reconnect && reconnect()) {
@@ -303,10 +304,10 @@ bool VideoCapture::decode(uint8_t *frame, int64_t *pts)
 
         // ========== 4. Successfully got a frame ==========
         if (av_frame->format < 0 || av_frame->format >= AV_PIX_FMT_NB || av_frame->width <= 0 || av_frame->height <= 0) {
-            LOG(ERRO, "decode: Corrupted frame format(%d) or size(%dx%d) on sudden disconnect", 
+            LOG(ERRO, "decode: Corrupted frame format(%d) or size(%dx%d) on sudden disconnect",
                 av_frame->format, av_frame->width, av_frame->height);
             av_frame_unref(av_frame);
-            continue; 
+            continue;
         }
 
         // ----- 4.1 Validate frame data integrity -----
