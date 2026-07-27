@@ -54,7 +54,7 @@ Texture::Texture(const std::string filepathname, std::string texType, bool isPgm
 	//std::cout << "Texture Constructor" << std::endl;
 	m_filepathName = filepathname;
     m_type = texType;
-	m_isPgm = m_isPgm;
+	m_isPgm = isPgm;
 
 	glGenTextures(1, &m_TextureID);
 
